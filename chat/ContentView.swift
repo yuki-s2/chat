@@ -37,53 +37,48 @@ struct ContentView: View {
     }
     
     var body: some View {
-        Button {
-            speak(text: "Hello")
-        } label: {
-            Text("Speak")
-        }
+        Background {
+            VStack {
+                ScrollView {
+                    VStack {
+                        ForEach(messages) { message in
+                            messageRow(message)
+                        }
+                    }
+                    .padding()
+                }
 
-//        Background {
-//            VStack {
-//                ScrollView {
-//                    VStack {
-//                        ForEach(messages) { message in
-//                            messageRow(message)
-//                        }
-//                    }
-//                    .padding()
-//                }
-//
-//                HStack {
-//                    TextField("", text: $textFieldValue)
-//                        .textFieldStyle(.roundedBorder)
-//                        .padding()
-//                        .focused($isFocused)
-//                    Button {
-//                        let newMessage = Message(id: .init(), text: textFieldValue, isMyMessage: true)
-//                        messages.append(newMessage)
-//                        isFocused = false
-//                        speak(text: "Hello, Yuki!")
-//
-//                        DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
-//                            let responseMessage = Message(id: .init(), text: "受け取りました！", isMyMessage: false)
-//                            messages.append(responseMessage)
-//                        }
-//
-//                    } label: {
-//                        Image(systemName: "arrow.up.circle.fill")
-//                            .resizable()
-//                            .frame(width: 30, height: 30)
-//                            .foregroundColor(Color.blue)
-//                    }
-//
-//                }
-//                .padding(.horizontal)
-//            }
-//        }
-//        .onTapGesture {
-//            isFocused = false
-//        }
+                HStack {
+                    TextField("", text: $textFieldValue)
+                        .textFieldStyle(.roundedBorder)
+                        .padding()
+                        .focused($isFocused)
+                    Button {
+                        let newMessage = Message(id: .init(), text: textFieldValue, isMyMessage: true)
+                        messages.append(newMessage)
+                        isFocused = false
+
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+                            let newMessageText = "Hello, Yuki!"
+                            let responseMessage = Message(id: .init(), text: newMessageText, isMyMessage: false)
+                            messages.append(responseMessage)
+                            speak(text: newMessageText)
+                        }
+
+                    } label: {
+                        Image(systemName: "arrow.up.circle.fill")
+                            .resizable()
+                            .frame(width: 30, height: 30)
+                            .foregroundColor(Color.blue)
+                    }
+
+                }
+                .padding(.horizontal)
+            }
+        }
+        .onTapGesture {
+            isFocused = false
+        }
     }
     
     private func messageRow(_ message: Message) -> some View {
@@ -124,16 +119,14 @@ struct ContentView: View {
             print("speak failed: \(error)")
         }
         
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-            let synthesizer = AVSpeechSynthesizer()
-            let utterance = AVSpeechUtterance(string: "text")
-            utterance.voice = .init(language: "en-US") // 言語を設定する
-            utterance.volume = 0.5
-            utterance.rate = 0.5
-            utterance.pitchMultiplier = 1.2
-            synthesizer.speak(utterance)
-            print("speak text")
-        }
+        let synthesizer = AVSpeechSynthesizer()
+        let utterance = AVSpeechUtterance(string: text)
+        utterance.voice = .init(language: "en-US") // 言語を設定する
+        utterance.volume = 0.5
+        utterance.rate = 0.5
+        utterance.pitchMultiplier = 1.2
+        synthesizer.speak(utterance)
+        print("speak: \(text)")
     }
 }
 
